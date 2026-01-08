@@ -1,0 +1,586 @@
+<div class="offcanvas-header details-slide-header">
+  <div class="d-flex align-items-center">
+    <button
+      class="custom-btn bg-transparent border-0"
+      id="backToScriptResults"
+      onclick="backToResults()"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M10.6 6L5 12M5 12L10.6 18M5 12H19"
+          stroke="white"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+    <h5
+      class="offcanvas-title font-weight-600 font-size-12 primary-font-family"
+      id="offcanvasExampleLabel"
+    >
+      Step Results
+    </h5>
+  </div>
+</div>
+<div class="offcanvas-body description-body p-2">
+  <div class="results-details ps-1">
+    <div class="row row-cols-3">
+      <div class="col description">
+        <div class="description-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+            id="description-header"
+          >
+            Description
+          </p>
+        </div>
+        <div class="description-content">
+          <p
+            class="dark-text-color primary-font-family font-size-12 font-weight-500"
+            title="${data?.stepResult?.name}"
+          >
+            ${truncateText(data?.stepResult?.name, 35)}
+          </p>
+        </div>
+      </div>
+      <div class="col results">
+        <div class="result-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+          >
+            Result
+          </p>
+        </div>
+        <div class="result-details">
+          <p
+            class="dark-text-color primary-font-family font-size-12 font-weight-500 m-0"
+            title="${data?.stepResult?.message}"
+          >
+            ${truncateText(data?.stepResult?.message, 35)}
+          </p>
+        </div>
+      </div>
+      <div class="col return">
+        <div class="return-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+          >
+            Return
+          </p>
+        </div>
+        <div class="return-details">
+          <p
+            class="dark-text-color primary-font-family font-size-12 font-weight-500 m-0"
+            id="return-value"
+            title="${data?.stepResult?.stepReturn?.type} variable: ${data?.stepResult?.stepReturn?.name}: ${data?.stepResult?.stepReturn?.value}"
+          >
+            <!-- Return value will be displayed here -->
+          </p>
+        </div>
+      </div>
+      ${['FAIL', 'WARNING', 'TERMINATED'].includes(data?.stepResult?.status) ? `
+      <div class="col failed-message">
+        <div class="screenshot-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+          >
+            If Failed
+          </p>
+        </div>
+        <div class="message-details d-flex align-items-center">
+          <div
+            class="dark-text-color primary-font-family font-size-12 font-weight-500 m-0"
+            title="Mark this step as failed and continue step group execution"
+          >
+            <p class="m-0">
+              ${truncateText("Mark this step as failed and continue step group"+
+              "execution", 35)}
+            </p>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      <div class="col screenshot">
+        <div class="screenshot-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+          >
+            Screenshot
+          </p>
+        </div>
+        <div class="screenshot-details d-flex align-items-center">
+          <div
+            class="scrrenshot-title font-size-12 font-weight-600 primary-font-family primary-color me-2"
+          >
+            <p class="m-0">
+              ${getConfigurationMessageForScreenshot(data?.stepResult)}
+              ${addInfoIcon(data?.stepResult) ? `
+              <button
+                type="button"
+                aria-label="i-button"
+                class="cursor_pointer tooltip-button"
+                style="
+                  border: none;
+                  background: none;
+                  cursor: pointer;
+                  position: relative;
+                "
+              >
+                <svg
+                  id="info_black_24dp"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    id="Path_426"
+                    data-name="Path 426"
+                    d="M0,0H24V24H0Z"
+                    fill="none"
+                  />
+                  <path
+                    id="Path_427"
+                    data-name="Path 427"
+                    d="M11,7h2V9H11Zm0,4h2v6H11Zm1-9A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8.011,8.011,0,0,1,12,20Z"
+                    fill="#1648c6"
+                  />
+                </svg>
+                <div class="tooltip-text-info-icon ">${addInfoIcon(data?.stepResult).trim()}</div>
+              </button
+              >` : ''}
+            </p>
+          </div>
+           ${data?.stepResult?.screenshotURL && data?.stepResult?.platform !== "Common" ? `
+          <div class="download-icon cursor_pointer">
+            <div
+              onclick="downloadScreenshot('${data?.stepResult?.screenshotURL}','${data?.stepResult?.screenShotCapturedDateTime}','${data?.stepResult?.scriptRunDetails?.executionId}', '${data?.stepResult?.scriptRunDetails?.scriptId}')"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M7.00057 0.97998C7.23253 0.97998 7.42057 1.16802 7.42057 1.39998V7.85268L9.50358 5.76966C9.6676 5.60564 9.93353 5.60564 10.0976 5.76966C10.2616 5.93368 10.2616 6.19961 10.0976 6.36363L7.29755 9.16363C7.13353 9.32765 6.8676 9.32765 6.70358 9.16363L3.90358 6.36363C3.73956 6.19961 3.73956 5.93368 3.90358 5.76966C4.0676 5.60564 4.33353 5.60564 4.49755 5.76966L6.58057 7.85268V1.39998C6.58057 1.16802 6.76861 0.97998 7.00057 0.97998ZM2.33385 9.33332C2.59159 9.33332 2.80052 9.54226 2.80052 9.79999V11.2C2.80052 11.7169 3.21646 12.1333 3.73045 12.1333H10.2683C10.7833 12.1333 11.2005 11.7159 11.2005 11.2V9.79999C11.2005 9.54226 11.4095 9.33332 11.6672 9.33332C11.9249 9.33332 12.1339 9.54226 12.1339 9.79999V11.2C12.1339 12.2305 11.2997 13.0667 10.2683 13.0667H3.73045C2.69803 13.0667 1.86719 12.2294 1.86719 11.2V9.79999C1.86719 9.54226 2.07612 9.33332 2.33385 9.33332Z"
+                  fill="#808080"
+                />
+              </svg>
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+      <div class="col video">
+        <div class="video-header">
+          <p
+            class="secondary-color primary-font-family font-size-12 font-weight-400 mb-1"
+          >
+            Video
+          </p>
+        </div>
+        <div class="video-details d-flex align-items-center">
+          <div
+            class="video-title d-flex align-items-center font-size-12 font-weight-600 primary-font-family primary-color me-2"
+          >
+            <p class="m-0" id="download-video-text">Download Video</p>
+            ${getVidoeInfoButton() ? `
+            <button
+              type="button"
+              aria-label="i-button"
+              class="cursor_pointer tooltip-button"
+              style="
+                border: none;
+                background: none;
+                cursor: pointer;
+                position: relative;
+              "
+            >
+              <svg
+                id="info_black_24dp"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  id="Path_426"
+                  data-name="Path 426"
+                  d="M0,0H24V24H0Z"
+                  fill="none"
+                />
+                <path
+                  id="Path_427"
+                  data-name="Path 427"
+                  d="M11,7h2V9H11Zm0,4h2v6H11Zm1-9A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm0,18a8,8,0,1,1,8-8A8.011,8.011,0,0,1,12,20Z"
+                  fill="#1648c6"
+                />
+              </svg>
+              <div class="tooltip-text-download-video"><%= "Since this is an offline report, Videos are provided only for failed Scripts to enhance efficiency and optimize resources".trim() %></div></button
+            >` : ''}
+          </div>
+          <div
+            id="download-video-icon"
+            class="download-icon cursor_pointer"
+            title="Download"
+            onclick="downloadVideo('${newDetailsNode?.bucketName}', '${newDetailsNode?.videoRecorderPath}', '${newDetailsNode?.storageType}', 'video', '${newDetailsNode?.accessToken}', '${newDetailsNode?.baseUrl}','${getVideoURL(newDetailsNode,data,`presigned`)}', '${getVideoURL(newDetailsNode,data)}')"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M7.00057 0.97998C7.23253 0.97998 7.42057 1.16802 7.42057 1.39998V7.85268L9.50358 5.76966C9.6676 5.60564 9.93353 5.60564 10.0976 5.76966C10.2616 5.93368 10.2616 6.19961 10.0976 6.36363L7.29755 9.16363C7.13353 9.32765 6.8676 9.32765 6.70358 9.16363L3.90358 6.36363C3.73956 6.19961 3.73956 5.93368 3.90358 5.76966C4.0676 5.60564 4.33353 5.60564 4.49755 5.76966L6.58057 7.85268V1.39998C6.58057 1.16802 6.76861 0.97998 7.00057 0.97998ZM2.33385 9.33332C2.59159 9.33332 2.80052 9.54226 2.80052 9.79999V11.2C2.80052 11.7169 3.21646 12.1333 3.73045 12.1333H10.2683C10.7833 12.1333 11.2005 11.7159 11.2005 11.2V9.79999C11.2005 9.54226 11.4095 9.33332 11.6672 9.33332C11.9249 9.33332 12.1339 9.54226 12.1339 9.79999V11.2C12.1339 12.2305 11.2997 13.0667 10.2683 13.0667H3.73045C2.69803 13.0667 1.86719 12.2294 1.86719 11.2V9.79999C1.86719 9.54226 2.07612 9.33332 2.33385 9.33332Z"
+                fill="#808080"
+              />
+            </svg>
+          </div>
+          <!-- Spinner -->
+          <div id="spinner" style="display: none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+            >
+              <g>
+                <circle cx="12" cy="3" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate0"
+                    attributeName="r"
+                    begin="0;svgSpinners12DotsScaleRotate2.end-0.5s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="16.5" cy="4.21" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate1"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate0.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="7.5" cy="4.21" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate2"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate4.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="19.79" cy="7.5" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate3"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate1.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="4.21" cy="7.5" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate4"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate6.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="21" cy="12" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate5"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate3.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="3" cy="12" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate6"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate8.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="19.79" cy="16.5" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate7"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate5.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="4.21" cy="16.5" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate8"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotatea.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="16.5" cy="19.79" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotate9"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate7.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="7.5" cy="19.79" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotatea"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotateb.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <circle cx="12" cy="21" r="1" fill="currentColor">
+                  <animate
+                    id="svgSpinners12DotsScaleRotateb"
+                    attributeName="r"
+                    begin="svgSpinners12DotsScaleRotate9.begin+0.1s"
+                    calcMode="spline"
+                    dur="0.6s"
+                    keySplines=".27,.42,.37,.99;.53,0,.61,.73"
+                    values="1;2;1"
+                  />
+                </circle>
+                <animateTransform
+                  attributeName="transform"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  type="rotate"
+                  values="360 12 12;0 12 12"
+                />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-2 ps-2 ms-1">
+    <ul
+      class="nav step-results-tabs nav-tabs row result-tab-button"
+      id="myTab"
+      role="tablist"
+    >
+      <li
+        class="col-4 p-0 font-size-12 primary-font-family dark-text-color"
+        role="presentation"
+        id="elementsTab"
+      >
+        <button
+          class="active font-weight-600 p-0 m-0"
+          id="elements-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#elements"
+          type="button"
+          role="tab"
+          aria-controls="elements"
+          aria-selected="true"
+        >
+          Elements
+        </button>
+      </li>
+      <li
+        class="col-4 p-0 font-size-12 primary-font-family dark-text-color result-tab-title"
+        role="presentation"
+        id="variablesTab"
+      >
+        <button
+          class="font-weight-600 p-0 m-0"
+          id="variable-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#variable"
+          type="button"
+          role="tab"
+          aria-controls="variable"
+          aria-selected="false"
+        >
+          Variables
+        </button>
+      </li>
+      <li
+        class="col-4 p-0 font-size-12 primary-font-family dark-text-color result-tab-title"
+        role="presentation"
+        id="logs-tab"
+      >
+        <button
+          class="font-weight-600 p-0 m-0"
+          id="logs-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#logs"
+          type="button"
+          role="tab"
+          aria-controls="logs"
+          aria-selected="false"
+        >
+          Logs
+        </button>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div
+        class="tab-pane fade show active results-table"
+        id="elements"
+        role="tabpanel"
+        aria-labelledby="elements-tab"
+      >
+        <table class="table" id="elements-table">
+          <thead class="result-tab-table-content">
+            <tr>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                LOCATOR TYPE
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                VALUE TYPE
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                LOCATOR VALUE
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                CAPTURED
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                STATUS
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--mapped elements data will be displayed here-->
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="tab-pane fade variable-table"
+        id="variable"
+        role="tabpanel"
+        aria-labelledby="variable-tab"
+      >
+        <!-- Content for Variable tab -->
+        <table class="table" id="variables-table">
+          <thead class="result-tab-table-content">
+            <tr>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                NAME
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                TYPE
+              </th>
+              <th class="primary-color border-0 font-weight-600 font-size-12">
+                VALUE
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--mapped variable data will be displayed here-->
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="tab-pane fade mt-2"
+        id="logs"
+        role="tabpanel"
+        aria-labelledby="logs-tab"
+      >
+        <div class="row row-cols-2">
+          <div class="col">
+            <div class="message-header">
+              <p
+                class="secondary-color primary-font-family font-size-12 font-weight-400 mb-2"
+              >
+                Message
+              </p>
+            </div>
+            <div class="message-details">
+              <p
+                class="dark-text-color primary-font-family font-size-12 font-weight-500"
+              >
+                ${data?.stepResult?.errorLog?.name || "---"}
+              </p>
+            </div>
+          </div>
+          <div class="col">
+            <div class="suggestion-header">
+              <p
+                class="secondary-color primary-font-family font-size-12 font-weight-400 mb-2"
+              >
+                Suggestion
+              </p>
+            </div>
+            <div class="suggestion-details">
+              <p
+                class="dark-text-color primary-font-family font-size-12 font-weight-500"
+              >
+                ${data?.stepResult?.errorLog?.suggestions || "---"}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+           <div class="exception-header">
+            <p
+              class="secondary-color primary-font-family font-size-12 font-weight-400 mb-2"
+            >
+              Exception
+            </p>
+          </div>
+          <div class="exception-details">
+            <p
+              class="dark-text-color primary-font-family font-size-12 font-weight-500"
+            >
+              ${data?.stepResult?.errorLog?.cause ||"---"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
